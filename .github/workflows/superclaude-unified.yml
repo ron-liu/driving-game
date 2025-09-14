@@ -101,4 +101,4 @@ jobs:
 
             Execute every step above. DO NOT STOP until Pull Request exists.
 
-          claude_args: '--allowed-tools "*" --allowed-tools "Bash(git checkout:*)" --allowed-tools "Bash(git branch:*)" --allowed-tools "Bash(gh:*)" --max-turns 20'
+          claude_args: '--allowed-tools "*,Bash(git checkout:*),Bash(git branch:*),Bash(gh:*)" --max-turns 20'
