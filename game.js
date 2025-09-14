@@ -802,11 +802,49 @@ function resetGame() {
 
 // Leaderboard functionality
 const LEADERBOARD_KEY = 'cybertruckLeaderboard';
-const MAX_LEADERBOARD_ENTRIES = 5;
+const MAX_LEADERBOARD_ENTRIES = 10; // Increased to 10 for better leaderboard display
 const MIN_SCORE_THRESHOLD = 0;
 const MAX_NAME_LENGTH = 20;
 let leaderboard = [];
 let hasHighScoreBeenChecked = false; // Flag to prevent repeated DOM queries
+
+// Share score functionality
+function shareScore() {
+    const shareText = `🏆 I scored ${score} points in Archie's Cybertruck vs Dinosaurs! Can you beat my score? 🚙🦕`;
+    
+    // Check if Web Share API is available
+    if (navigator.share) {
+        navigator.share({
+            title: 'Cybertruck vs Dinosaurs High Score',
+            text: shareText,
+            url: window.location.href
+        }).catch(err => {
+            // Fallback to clipboard if share fails
+            copyToClipboard(shareText);
+        });
+    } else {
+        // Fallback: copy to clipboard
+        copyToClipboard(shareText);
+    }
+}
+
+// Copy to clipboard helper
+function copyToClipboard(text) {
+    const tempInput = document.createElement('textarea');
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    
+    // Show feedback
+    const originalText = document.querySelector('.btn-share').textContent;
+    document.querySelector('.btn-share').textContent = 'Copied!';
+    setTimeout(() => {
+        const shareBtn = document.querySelector('.btn-share');
+        if (shareBtn) shareBtn.textContent = originalText;
+    }, 2000);
+}
 
 // Helper function to sanitize user input to prevent XSS
 function sanitizeInput(input) {
@@ -821,11 +859,16 @@ function sanitizeInput(input) {
 // Initialize default leaderboard with demo scores
 function initializeDefaultLeaderboard() {
     leaderboard = [
-        { name: 'CyberPilot', score: 500 },
-        { name: 'DinoHunter', score: 350 },
-        { name: 'TruckMaster', score: 200 },
-        { name: 'SpeedRacer', score: 150 },
-        { name: 'RoadWarrior', score: 100 }
+        { name: '🌟 CyberAce', score: 1500 },
+        { name: '🔥 TurboDriver', score: 1200 },
+        { name: '⚡ Lightning', score: 950 },
+        { name: '🦖 DinoSlayer', score: 800 },
+        { name: '🚀 SpeedDemon', score: 650 },
+        { name: '🏎️ RaceKing', score: 500 },
+        { name: '💥 Crusher', score: 400 },
+        { name: '🌊 WaveRider', score: 300 },
+        { name: '🎆 NightHawk', score: 200 },
+        { name: '🌈 Rainbow', score: 100 }
     ];
     saveLeaderboard();
 }
@@ -877,13 +920,13 @@ function addToLeaderboard(name, score) {
     updateLeaderboardDisplay();
 }
 
-// Update the leaderboard display
+// Update the leaderboard display with modern gaming aesthetics
 function updateLeaderboardDisplay() {
     const leaderboardList = document.getElementById('leaderboardList');
     if (!leaderboardList) return;
 
     if (leaderboard.length === 0) {
-        leaderboardList.innerHTML = '<li class="leaderboard-empty">No scores yet. Be the first!</li>';
+        leaderboardList.innerHTML = '<li class="leaderboard-empty">No scores yet. Be the first champion!</li>';
         return;
     }
 
@@ -900,10 +943,18 @@ function updateLeaderboardDisplay() {
 
         const rank = document.createElement('div');
         rank.className = 'leaderboard-rank';
-        if (index === 0) rank.classList.add('gold');
-        else if (index === 1) rank.classList.add('silver');
-        else if (index === 2) rank.classList.add('bronze');
-        rank.textContent = `#${index + 1}`;
+        if (index === 0) {
+            rank.classList.add('gold');
+            rank.innerHTML = '🥇'; // Gold medal emoji
+        } else if (index === 1) {
+            rank.classList.add('silver');
+            rank.innerHTML = '🥈'; // Silver medal emoji
+        } else if (index === 2) {
+            rank.classList.add('bronze');
+            rank.innerHTML = '🥉'; // Bronze medal emoji
+        } else {
+            rank.textContent = `${index + 1}`;
+        }
 
         const player = document.createElement('div');
         player.className = 'leaderboard-player';
@@ -925,11 +976,20 @@ function checkHighScore() {
     if (score > MIN_SCORE_THRESHOLD && 
         (leaderboard.length < MAX_LEADERBOARD_ENTRIES || 
          score > leaderboard[leaderboard.length - 1].score)) {
-        // Ask for player name
+        // Ask for player name with modern styling
         setTimeout(() => {
-            const rawName = prompt(`🎉 High Score: ${score}! Enter your name for the leaderboard:`);
+            const rawName = prompt(`🏆 NEW HIGH SCORE: ${score}!\n\nEnter your name for the Hall of Fame:`);
             const playerName = sanitizeInput(rawName || 'Anonymous');
             addToLeaderboard(playerName, score);
+            
+            // Flash the leaderboard to draw attention
+            const leaderboardContainer = document.getElementById('leaderboard');
+            if (leaderboardContainer) {
+                leaderboardContainer.style.animation = 'none';
+                setTimeout(() => {
+                    leaderboardContainer.style.animation = 'leaderboardGlow 3s ease-in-out infinite alternate, newHighScore 0.5s ease-out';
+                }, 10);
+            }
         }, 500);
     }
 }

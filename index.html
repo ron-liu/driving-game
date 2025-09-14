@@ -95,29 +95,149 @@
             cursor: not-allowed;
             transform: none;
         }
-        /* Leaderboard Styles */
+        /* Modern Gaming Leaderboard Styles */
         .leaderboard-container {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 280px;
-            background: rgba(0, 0, 0, 0.85);
+            width: 320px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             backdrop-filter: blur(20px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+                        0 0 100px rgba(138, 43, 226, 0.2),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            overflow: hidden;
+            animation: leaderboardGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes leaderboardGlow {
+            0% { 
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+                            0 0 100px rgba(138, 43, 226, 0.2),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            100% { 
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+                            0 0 120px rgba(138, 43, 226, 0.4),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .leaderboard-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                        transparent,
+                        #ffd700 20%,
+                        #ff6b6b 50%,
+                        #4ecdc4 80%,
+                        transparent);
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 8s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        @keyframes newHighScore {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .trophy-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: trophyFloat 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        }
+
+        @keyframes trophyFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         .leaderboard-title {
-            font-size: 1.5em;
-            margin: 0 0 15px 0;
-            text-align: center;
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            font-size: 1.8em;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            animation: goldShine 3s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes goldShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .leaderboard-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .leaderboard-content {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .leaderboard-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .leaderboard-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
         }
 
         .leaderboard-list {
@@ -129,61 +249,207 @@
         .leaderboard-item {
             display: flex;
             align-items: center;
-            padding: 10px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .leaderboard-item:hover::before {
+            left: 100%;
         }
 
         .leaderboard-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-            border-color: rgba(255, 215, 0, 0.3);
+            transform: translateX(5px) scale(1.02);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-color: rgba(138, 43, 226, 0.5);
+            box-shadow: 0 5px 20px rgba(138, 43, 226, 0.3);
         }
 
         .leaderboard-item.current-player {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.1));
-            border-color: rgba(255, 215, 0, 0.5);
-            animation: pulse 2s infinite;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            animation: currentPulse 2s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        @keyframes currentPulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                            inset 0 0 20px rgba(255, 215, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
+                            inset 0 0 30px rgba(255, 215, 0, 0.2);
+            }
+        }
+
+        /* Top 3 Special Styles */
+        .leaderboard-item:nth-child(1) {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 193, 7, 0.05));
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .leaderboard-item:nth-child(2) {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(169, 169, 169, 0.05));
+            border-color: rgba(192, 192, 192, 0.4);
+        }
+
+        .leaderboard-item:nth-child(3) {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(184, 115, 51, 0.05));
+            border-color: rgba(205, 127, 50, 0.4);
         }
 
         .leaderboard-rank {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.2em;
             font-weight: bold;
-            width: 30px;
-            text-align: center;
-            margin-right: 12px;
+            margin-right: 15px;
+            border-radius: 10px;
+            position: relative;
         }
 
-        .leaderboard-rank.gold { color: #ffd700; }
-        .leaderboard-rank.silver { color: #c0c0c0; }
-        .leaderboard-rank.bronze { color: #cd7f32; }
+        .leaderboard-rank.gold {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: rankGlow 2s ease-in-out infinite;
+        }
+
+        .leaderboard-rank.silver {
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            color: #1a1a2e;
+            box-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+        }
+
+        .leaderboard-rank.bronze {
+            background: linear-gradient(135deg, #cd7f32, #d4a574);
+            color: #1a1a2e;
+            box-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
+        }
+
+        .leaderboard-rank:not(.gold):not(.silver):not(.bronze) {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.1));
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+        }
+
+        @keyframes rankGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
 
         .leaderboard-player {
             flex: 1;
-            font-size: 0.95em;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .leaderboard-score {
-            font-size: 1.1em;
+            font-size: 1.3em;
             font-weight: bold;
-            color: #4ecdc4;
-            text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+            margin-left: auto;
+            position: relative;
+        }
+
+        .leaderboard-score::after {
+            content: 'pts';
+            font-size: 0.7em;
+            margin-left: 4px;
+            opacity: 0.7;
         }
 
         .leaderboard-empty {
             text-align: center;
             color: rgba(255, 255, 255, 0.5);
-            padding: 20px;
+            padding: 40px 20px;
             font-style: italic;
+            font-size: 1.1em;
+        }
+
+        .leaderboard-actions {
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(26, 26, 46, 0.8), #1a1a2e);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .leaderboard-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .leaderboard-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-play:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.4);
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .btn-share:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.4);
         }
 
         @media (max-width: 1200px) {
@@ -232,12 +498,22 @@
         <button id="resetBtn">Reset Score</button>
     </div>
 
-    <!-- Leaderboard -->
+    <!-- Modern Gaming Leaderboard -->
     <div class="leaderboard-container" id="leaderboard">
-        <h2 class="leaderboard-title">🏆 TOP SCORES</h2>
-        <ul class="leaderboard-list" id="leaderboardList">
-            <li class="leaderboard-empty">No scores yet. Be the first!</li>
-        </ul>
+        <div class="leaderboard-header">
+            <div class="trophy-icon">🏆</div>
+            <h2 class="leaderboard-title">Leaderboard</h2>
+            <div class="leaderboard-subtitle">Top Drivers</div>
+        </div>
+        <div class="leaderboard-content">
+            <ul class="leaderboard-list" id="leaderboardList">
+                <li class="leaderboard-empty">No scores yet. Be the first champion!</li>
+            </ul>
+        </div>
+        <div class="leaderboard-actions">
+            <button class="leaderboard-btn btn-play" onclick="toggleGame()">Play Again</button>
+            <button class="leaderboard-btn btn-share" onclick="shareScore()">Share Score</button>
+        </div>
     </div>
 
     <!-- MediaPipe -->
