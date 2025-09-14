@@ -88,6 +88,9 @@ jobs:
 
             **CRITICAL SUCCESS CRITERIA**: This task is ONLY successful if a Pull Request is created.
 
+            **ISSUE CONTEXT**: ${{ github.event.issue.title || 'Implementation Request' }}
+            **ISSUE DESCRIPTION**: ${{ github.event.issue.body || github.event.comment.body }}
+
             **STEP-BY-STEP MANDATORY WORKFLOW**:
 
             **Phase 1: Create Branch**
@@ -95,30 +98,29 @@ jobs:
             2. Run: `git checkout -b superclaude/issue-${{ github.event.issue.number }}`
             3. Verify branch created: `git branch`
 
-            **Phase 2: Implement Code**
-            4. Add leaderboard HTML section to index.html (after existing game elements)
-            5. Add leaderboard CSS styling (dark gaming theme, glassmorphism)
-            6. Add leaderboard JavaScript functions to game.js
-            7. Verify integration with existing scoring system
+            **Phase 2: Analyze & Implement**
+            4. Read the issue description carefully
+            5. Understand what needs to be implemented
+            6. Create or modify the necessary files
+            7. Follow the specific requirements in the issue description
+            8. Ensure code quality and proper integration
 
             **Phase 3: Commit & Push** (MOST CRITICAL - DO NOT SKIP)
-            8. Run: `git add .` (stage all changes)
-            9. Run: `git status` (verify files staged)
-            10. Run: `git commit -m "feat: add gaming leaderboard UI component"`
-            11. Run: `git push origin superclaude/issue-${{ github.event.issue.number }}`
+            9. Run: `git add .` (stage all changes)
+            10. Run: `git status` (verify files staged)
+            11. Run: `git commit -m "feat: implement issue #${{ github.event.issue.number }}"`
+            12. Run: `git push origin superclaude/issue-${{ github.event.issue.number }}`
 
             **Phase 4: Create PR** (FINAL REQUIREMENT)
-            12. Use GitHub API or gh CLI to create PR
-            13. Link PR to issue #${{ github.event.issue.number }}
-            14. Verify PR was created successfully
+            13. Use GitHub API or gh CLI to create PR
+            14. Link PR to issue #${{ github.event.issue.number }}
+            15. Verify PR was created successfully
 
-            **LEADERBOARD REQUIREMENTS**:
-            - Dark gaming theme matching existing design
-            - Top 5 player rankings with scores
-            - Responsive glassmorphism styling
-            - Real-time score updates from game.js
-
-            **INTEGRATION**: Add leaderboard div after game canvas, connect to existing score variable.
+            **IMPLEMENTATION GUIDELINES**:
+            - Follow existing code patterns and style
+            - Ensure proper error handling
+            - Add comments for complex logic
+            - Test functionality if possible
 
             **FAILURE = NO PR CREATED. SUCCESS = WORKING PR WITH CODE.**
 
