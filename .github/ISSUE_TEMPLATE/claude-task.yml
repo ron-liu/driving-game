@@ -1,0 +1,46 @@
+name: Claude Task
+description: Create a task for Claude to work on automatically
+title: "[Claude Task] "
+labels: ["claude-fix", "enhancement"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Describe what you want Claude to implement
+      placeholder: "Add user authentication with JWT tokens"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      options:
+        - Simple (1-2 files)
+        - Medium (3-5 files)
+        - Complex (5+ files, multiple components)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: Requirements
+      options:
+        - label: Include tests
+        - label: Update documentation
+        - label: Follow existing patterns
+        - label: Consider security implications

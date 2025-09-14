@@ -1,0 +1,109 @@
+name: SuperClaude Task Handler
+
+on:
+  repository_dispatch:
+    types: [superclaude-task]
+  workflow_dispatch:
+    inputs:
+      task_description:
+        description: 'Describe what you want SuperClaude to build'
+        required: true
+        type: string
+      priority:
+        description: 'Task priority'
+        required: false
+        default: 'medium'
+        type: choice
+        options:
+          - low
+          - medium
+          - high
+          - critical
+
+jobs:
+  superclaude-task:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SuperClaude Task Processing
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            **SuperClaude Framework - Autonomous Task Handler**
+
+            🎯 **Task Request**: "${{ github.event.inputs.task_description || github.event.client_payload.task }}"
+            📊 **Priority**: "${{ github.event.inputs.priority || github.event.client_payload.priority || 'medium' }}"
+
+            **Phase 1: Task Analysis & Issue Creation**
+            /sc:load → Initialize project context
+
+            1. Use --brainstorm mode to understand requirements
+            2. Apply --task-manage to break into structured subtasks
+            3. Use --think to analyze scope and complexity
+            4. Create GitHub issue(s) with:
+               - Clear title and description
+               - Appropriate labels (enhancement, bug, feature)
+               - Task breakdown in issue body
+               - Estimated complexity and priority
+
+            **Phase 2: Automatic Implementation**
+            1. Create feature branch: `git checkout -b feature/auto-${{ github.run_id }}`
+            2. **Smart Tool Selection**:
+               - **Serena**: Use for large codebases (>10 files), symbol operations, project context
+               - **Morphllm**: Use for large files (>500 lines) with precise edits, pattern transformations
+               - **Magic**: Use for UI component generation and design systems
+               - **Context7**: Use for framework documentation and official patterns
+               - **Sequential**: Use for complex multi-step analysis and reasoning
+
+            3. **Tool Decision Logic**:
+               - Large file + small changes → Morphllm
+               - Symbol operations + large codebase → Serena
+               - Pattern edits across files → Morphllm
+               - Project context/memory → Serena
+               - Simple edits + small project → Native tools
+
+            4. Implement following SOLID principles
+            5. Write/update tests (mandatory)
+            6. Run quality checks (lint, typecheck)
+
+            **Phase 3: Delivery**
+            1. Commit with structured message
+            2. Create PR with:
+               - Clear description linking to issue
+               - Implementation details
+               - Test coverage info
+            3. Auto-assign for review if configured
+
+            **SuperClaude Task Management**:
+            - Use TodoWrite for progress tracking
+            - Apply /sc:save for session persistence
+            - Follow project conventions from CLAUDE.md
+            - Never skip validation or testing
+
+            **Example Commands Available**:
+            ```bash
+            # Create issues
+            gh issue create --title "Feature: User Authentication" --body "Detailed description..." --label "superclaude,enhancement"
+
+            # Link work
+            gh pr create --title "Implement: User Authentication" --body "Closes #123" --assignee @me
+            ```
+
+          claude_args: '--allowed-tools "*" --task-manage --orchestrate --concurrency 10'
+
+      - name: Notify Completion
+        if: always()
+        run: |
+          echo "SuperClaude task processing completed"
+          echo "Check Issues and Pull Requests tabs for results"

@@ -37,16 +37,38 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
-            Please review this pull request and provide feedback on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
-            
-            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+            **SuperClaude Framework Active** - Use intelligent analysis modes:
 
-            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+            /sc:load → Initialize project context and memory
+
+            Activate modes based on PR complexity:
+            - Simple changes: Standard review with --token-efficient
+            - Complex changes: Use --think for structured analysis
+            - Architecture changes: Use --think-hard with --sequential
+            - Multi-component: Use --orchestrate with --task-manage
+
+            **Review Focus Areas**:
+            - Code quality and best practices (follow SOLID principles)
+            - Security vulnerabilities and data safety
+            - Performance optimizations and bottlenecks
+            - Test coverage and validation completeness
+            - Framework compliance and pattern consistency
+
+            **SuperClaude Tool Selection**:
+            - **Serena**: For symbol operations and code relationships in large codebases
+            - **Morphllm**: For reviewing pattern-based changes in large files
+            - **Context7**: For framework documentation and official patterns
+            - **Sequential**: For complex multi-step analysis and reasoning
+            - Apply --uc for concise, symbol-enhanced feedback
+
+            **Review Tool Logic**:
+            - Large codebase analysis → Use Serena for semantic understanding
+            - Pattern/bulk changes → Use Morphllm for consistency verification
+            - Framework compliance → Use Context7 for official standards
+            - Complex logic → Use Sequential for structured reasoning
+
+            Use the repository's CLAUDE.md for project-specific guidance.
+            Leave structured feedback using `gh pr comment` with your Bash tool.
           
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.anthropic.com/en/docs/claude-code/sdk#command-line for available options

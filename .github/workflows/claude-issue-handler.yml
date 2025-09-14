@@ -1,0 +1,67 @@
+name: Claude Issue Handler
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-issue-work:
+    # Only run on issues with specific labels
+    if: contains(github.event.issue.labels.*.name, 'claude-fix') || (github.event.comment && contains(github.event.comment.body, '@claude'))
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code on Issue
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            **SuperClaude Framework Active** - Issue Resolution Mode
+
+            /sc:load → Initialize project context
+
+            **Task Management Workflow**:
+            1. Use --task-manage to break issue into structured tasks
+            2. Apply TodoWrite for progress tracking
+            3. Use appropriate analysis modes:
+               - --think for code analysis
+               - --think-hard for complex architecture
+               - --orchestrate for multi-tool coordination
+
+            **Implementation Strategy**:
+            1. Understand issue requirements (use --brainstorm if unclear)
+            2. Analyze codebase with semantic tools
+            3. Create feature branch: `git checkout -b issue-${{ github.event.issue.number }}`
+            4. Implement solution following SOLID principles
+            5. Write/update tests (never skip validation)
+            6. Create PR with structured description
+            7. Link PR to original issue
+
+            **SuperClaude Tools Available**:
+            - --serena: Semantic code operations and project memory
+            - --context7: Framework documentation lookup
+            - --sequential: Complex reasoning and analysis
+            - --magic: UI component generation if needed
+            - --morphllm: Bulk code transformations
+
+            **Quality Gates**:
+            - Run lint/typecheck before committing
+            - Ensure tests pass
+            - Follow project conventions from CLAUDE.md
+
+            /sc:save → Preserve session context
+
+          claude_args: '--allowed-tools "*" --concurrency 5'
