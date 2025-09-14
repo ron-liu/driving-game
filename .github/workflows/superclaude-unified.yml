@@ -39,52 +39,43 @@ jobs:
           base_branch: main
           branch_prefix: superclaude/
           track_progress: true
+          settings: |
+            {
+              "workingDirectory": ".",
+              "environmentVariables": {
+                "NODE_ENV": "development"
+              }
+            }
           prompt: |
-            **SuperClaude Framework Active** - Full Implementation Mode
+            🚨 **URGENT: DO NOT JUST ANALYZE - IMPLEMENT CODE** 🚨
 
-            /sc:load → Initialize project context
+            **YOU MUST CREATE ACTUAL CODE FILES, BRANCHES, AND PULL REQUESTS**
 
-            **CRITICAL: This is IMPLEMENTATION mode - you MUST create branches and PRs**
+            This issue requires IMPLEMENTATION, not just analysis or comments.
 
-            **Branch Strategy**:
-            1. Create feature branch: `git checkout -b superclaude/issue-${{ github.event.issue.number || github.event.comment.id }}`
-            2. Make all code changes and commits
-            3. Push branch and create PR
-            4. Link PR to issue #${{ github.event.issue.number }}
+            **MANDATORY ACTIONS** (failure to complete all means task failure):
+            1. ✅ `git checkout -b superclaude/issue-${{ github.event.issue.number }}`
+            2. ✅ Write actual code files (HTML/CSS/JS)
+            3. ✅ `git add` and `git commit` changes
+            4. ✅ `git push origin superclaude/issue-${{ github.event.issue.number }}`
+            5. ✅ Create PR using GitHub API
 
-            **Task Management Workflow**:
-            1. Use --task-manage to break issue into structured tasks
-            2. Apply TodoWrite for progress tracking
-            3. Use appropriate analysis modes:
-               - --think for code analysis
-               - --think-hard for complex architecture
-               - --orchestrate for multi-tool coordination
+            **Task**: Implement gaming leaderboard UI component based on:
+            https://www.figma.com/community/file/1189534749500925267/leaderboard
 
-            **Implementation Strategy**:
-            1. Understand requirements (use --brainstorm if unclear)
-            2. Analyze codebase with semantic tools (--serena)
-            3. CREATE FEATURE BRANCH immediately
-            4. Implement solution following SOLID principles
-            5. Write/update tests (never skip validation)
-            6. COMMIT all changes with proper messages
-            7. PUSH branch to origin
-            8. CREATE PR with structured description
-            9. Link PR to original issue
+            **Requirements**:
+            - Modern dark gaming theme
+            - Player rankings with scores
+            - Responsive design
+            - Integration with existing game.js scoring system
 
-            **SuperClaude Tools Available**:
-            - --serena: Semantic code operations and project memory
-            - --context7: Framework documentation lookup
-            - --sequential: Complex reasoning and analysis
-            - --magic: UI component generation if needed
-            - --morphllm: Bulk code transformations
+            **Integration Points**:
+            - Add to existing index.html layout
+            - Extend game.js scoring functionality
+            - Match current glassmorphism design
 
-            **Quality Gates**:
-            - Run lint/typecheck before committing
-            - Ensure tests pass
-            - Follow project conventions from CLAUDE.md
+            **Expected Deliverable**: Working PR with actual implementation, NOT analysis comments.
 
-            **Success Criteria**: Issue resolved with working code in PR, not just analysis comments
+            Use Bash tool for git operations, Write/Edit tools for code, ensure all files are committed and pushed.
 
-            /sc:save → Preserve session context
-
-          claude_args: '--allowed-tools "*" --max-turns 10'
+          claude_args: '--allowed-tools "*" --max-turns 15'
