@@ -793,10 +793,166 @@ function resetGame() {
     gameRunning = false;
     playerCar.x = 200;
     steeringAngle = 0;
+    hasHighScoreBeenChecked = false; // Reset the flag
 
     startBtn.textContent = 'Start Game';
     handStatusEl.textContent = 'Game reset! Ready to play again 🚗';
     gameStatusEl.textContent = 'Score: 0 | Speed: 1';
+}
+
+// Leaderboard functionality
+const LEADERBOARD_KEY = 'cybertruckLeaderboard';
+const MAX_LEADERBOARD_ENTRIES = 5;
+const MIN_SCORE_THRESHOLD = 0;
+const MAX_NAME_LENGTH = 20;
+let leaderboard = [];
+let hasHighScoreBeenChecked = false; // Flag to prevent repeated DOM queries
+
+// Helper function to sanitize user input to prevent XSS
+function sanitizeInput(input) {
+    if (!input) return 'Anonymous';
+    // Remove HTML/script tags and dangerous characters
+    return input
+        .replace(/[<>"'&]/g, '')
+        .trim()
+        .substring(0, MAX_NAME_LENGTH);
+}
+
+// Initialize default leaderboard with demo scores
+function initializeDefaultLeaderboard() {
+    leaderboard = [
+        { name: 'CyberPilot', score: 500 },
+        { name: 'DinoHunter', score: 350 },
+        { name: 'TruckMaster', score: 200 },
+        { name: 'SpeedRacer', score: 150 },
+        { name: 'RoadWarrior', score: 100 }
+    ];
+    saveLeaderboard();
+}
+
+// Load leaderboard from localStorage with error handling
+function loadLeaderboard() {
+    try {
+        const saved = localStorage.getItem(LEADERBOARD_KEY);
+        if (saved) {
+            const parsedData = JSON.parse(saved);
+            // Validate the data structure
+            if (Array.isArray(parsedData) && 
+                parsedData.every(entry => 
+                    typeof entry === 'object' &&
+                    entry.hasOwnProperty('name') && 
+                    entry.hasOwnProperty('score') &&
+                    typeof entry.name === 'string' &&
+                    typeof entry.score === 'number')) {
+                leaderboard = parsedData;
+                updateLeaderboardDisplay();
+                return;
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to load leaderboard:', error);
+    }
+    // If loading failed or data is invalid, initialize defaults
+    initializeDefaultLeaderboard();
+    updateLeaderboardDisplay();
+}
+
+// Save leaderboard to localStorage with error handling
+function saveLeaderboard() {
+    try {
+        localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+    } catch (error) {
+        console.warn('Failed to save leaderboard:', error);
+    }
+}
+
+// Add a new score to the leaderboard
+function addToLeaderboard(name, score) {
+    // Sanitize the name before adding
+    const sanitizedName = sanitizeInput(name);
+    leaderboard.push({ name: sanitizedName, score });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES); // Keep only top entries
+    saveLeaderboard();
+    updateLeaderboardDisplay();
+}
+
+// Update the leaderboard display
+function updateLeaderboardDisplay() {
+    const leaderboardList = document.getElementById('leaderboardList');
+    if (!leaderboardList) return;
+
+    if (leaderboard.length === 0) {
+        leaderboardList.innerHTML = '<li class="leaderboard-empty">No scores yet. Be the first!</li>';
+        return;
+    }
+
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach((entry, index) => {
+        const listItem = document.createElement('li');
+        listItem.className = 'leaderboard-item';
+        
+        // Highlight current score if it matches (using flag instead of DOM query)
+        if (gameOver && entry.score === score && !hasHighScoreBeenChecked) {
+            listItem.classList.add('current-player');
+            hasHighScoreBeenChecked = true;
+        }
+
+        const rank = document.createElement('div');
+        rank.className = 'leaderboard-rank';
+        if (index === 0) rank.classList.add('gold');
+        else if (index === 1) rank.classList.add('silver');
+        else if (index === 2) rank.classList.add('bronze');
+        rank.textContent = `#${index + 1}`;
+
+        const player = document.createElement('div');
+        player.className = 'leaderboard-player';
+        player.textContent = entry.name;
+
+        const scoreDiv = document.createElement('div');
+        scoreDiv.className = 'leaderboard-score';
+        scoreDiv.textContent = entry.score;
+
+        listItem.appendChild(rank);
+        listItem.appendChild(player);
+        listItem.appendChild(scoreDiv);
+        leaderboardList.appendChild(listItem);
+    });
+}
+
+// Check if score qualifies for leaderboard
+function checkHighScore() {
+    if (score > MIN_SCORE_THRESHOLD && 
+        (leaderboard.length < MAX_LEADERBOARD_ENTRIES || 
+         score > leaderboard[leaderboard.length - 1].score)) {
+        // Ask for player name
+        setTimeout(() => {
+            const rawName = prompt(`🎉 High Score: ${score}! Enter your name for the leaderboard:`);
+            const playerName = sanitizeInput(rawName || 'Anonymous');
+            addToLeaderboard(playerName, score);
+        }, 500);
+    }
+}
+
+// Override checkCollisions to include high score check
+const originalCheckCollisions = checkCollisions;
+checkCollisions = function() {
+    // Call the original function first
+    const wasGameOver = gameOver;
+    originalCheckCollisions.call(this);
+    
+    // If game just ended, check for high score
+    if (!wasGameOver && gameOver) {
+        checkHighScore();
+    }
+};
+
+// Load leaderboard when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadLeaderboard);
+} else {
+    // DOM is already loaded
+    loadLeaderboard();
 }
 
 // Initialize when page loads
