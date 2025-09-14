@@ -1,5 +1,10 @@
 name: SuperClaude Unified Handler
 
+# Prevent duplicate workflow runs
+concurrency:
+  group: superclaude-${{ github.event.issue.number || github.event.comment.id || github.event.number }}
+  cancel-in-progress: false
+
 on:
   issues:
     types: [opened, labeled]
@@ -12,12 +17,21 @@ on:
 
 jobs:
   superclaude-handler:
-    # Clear conditions to avoid conflicts
+    # Prevent duplicate runs with strict conditions
     if: |
-      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'claude-fix')) ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+      (github.event_name == 'issues' &&
+       contains(github.event.issue.labels.*.name, 'claude-fix') &&
+       github.event.action == 'labeled') ||
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.comment.body, '@claude') &&
+       github.event.action == 'created' &&
+       github.actor != 'claude[bot]') ||
+      (github.event_name == 'pull_request_review_comment' &&
+       contains(github.event.comment.body, '@claude') &&
+       github.event.action == 'created') ||
+      (github.event_name == 'pull_request_review' &&
+       contains(github.event.review.body, '@claude') &&
+       github.event.action == 'submitted')
 
     runs-on: ubuntu-latest
     permissions:
