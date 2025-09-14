@@ -1,0 +1,55 @@
+name: Cleanup PR Preview
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Remove Preview Directory
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          
+          if [ -d "pr-${PR_NUMBER}" ]; then
+            echo "Removing preview directory for PR #${PR_NUMBER}"
+            rm -rf "pr-${PR_NUMBER}"
+            
+            # Configure git
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            # Commit and push changes
+            git add .
+            if git diff --staged --quiet; then
+              echo "No changes to commit"
+            else
+              git commit -m "cleanup: remove preview for PR #${PR_NUMBER}"
+              git push
+              echo "Preview cleanup completed for PR #${PR_NUMBER}"
+            fi
+          else
+            echo "Preview directory for PR #${PR_NUMBER} not found"
+          fi
+          
+      - name: Comment Cleanup Confirmation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr_number = context.payload.pull_request.number;
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `🧹 **Preview Cleaned Up**\n\nThe preview deployment for PR #${pr_number} has been removed.`,
+            });
