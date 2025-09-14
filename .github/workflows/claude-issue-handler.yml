@@ -64,4 +64,4 @@ jobs:
 
             /sc:save → Preserve session context
 
-          claude_args: '--allowed-tools "*" --concurrency 5'
+          claude_args: '--allowed-tools "*"'
