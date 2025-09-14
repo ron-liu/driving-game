@@ -1,5 +1,9 @@
 # 🚗 Archie's Hand-Controlled Driving Game
 
+**🎮 [▶️ PLAY NOW - LIVE DEMO](https://ron-liu.github.io/driving-game/) ◀️**
+
+[![](https://github.com/ron-liu/driving-game/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/ron-liu/driving-game/actions/workflows/deploy-pages.yml)
+
 **A gesture-controlled driving game built with MediaPipe and JavaScript**
 
 ## 🎯 Project Overview
