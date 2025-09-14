@@ -19,6 +19,7 @@ let dinoAnimations = {
 // Animation frame tracking
 let animationFrame = 0;
 let animationSpeed = 0.2; // How fast to cycle through animation frames
+let gameLoopInterval = null; // Store interval ID for cleanup
 
 // Difficulty settings
 let difficultySettings = {
@@ -133,8 +134,8 @@ function setup() {
     // Initialize face detection
     initializeFaceDetection();
 
-    // Start game loop
-    setInterval(gameLoop, 1000/60); // 60 FPS
+    // Start game loop with cleanup support
+    gameLoopInterval = setInterval(gameLoop, 1000/60); // 60 FPS
 }
 
 // Initialize MediaPipe face detection
@@ -484,287 +485,8 @@ function drawDinosaur(ctx, dino) {
     ctx.drawImage(currentFrame, x, y, dino.width, dino.height);
 }
 
-// Draw T-Rex - more detailed and realistic
-function drawTRex(ctx, x, y, width, height, color) {
-    // Add shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(x + 2, y + height + 2, width - 2, 3);
 
-    // Body with gradient
-    const bodyGradient = ctx.createLinearGradient(x, y, x + width, y + height);
-    bodyGradient.addColorStop(0, color);
-    bodyGradient.addColorStop(0.7, shadeColor(color, -20));
-    bodyGradient.addColorStop(1, shadeColor(color, -40));
-    ctx.fillStyle = bodyGradient;
 
-    // Main body (oval-like)
-    ctx.beginPath();
-    ctx.ellipse(x + width/2, y + height*0.6, width*0.3, height*0.25, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Head (larger and more detailed)
-    ctx.beginPath();
-    ctx.ellipse(x + width*0.2, y + height*0.25, width*0.25, height*0.2, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Snout
-    ctx.fillStyle = shadeColor(color, -10);
-    ctx.beginPath();
-    ctx.ellipse(x + width*0.05, y + height*0.28, width*0.15, height*0.08, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Powerful legs
-    ctx.fillStyle = shadeColor(color, -15);
-    // Left leg
-    ctx.fillRect(x + width*0.35, y + height*0.75, width*0.12, height*0.25);
-    // Right leg
-    ctx.fillRect(x + width*0.55, y + height*0.75, width*0.12, height*0.25);
-
-    // Feet with claws
-    ctx.fillStyle = '#2F2F2F';
-    ctx.fillRect(x + width*0.32, y + height*0.95, width*0.18, height*0.08);
-    ctx.fillRect(x + width*0.52, y + height*0.95, width*0.18, height*0.08);
-
-    // Tiny arms (characteristic of T-Rex)
-    ctx.fillStyle = shadeColor(color, -30);
-    ctx.fillRect(x + width*0.45, y + height*0.45, width*0.08, height*0.15);
-    ctx.fillRect(x + width*0.55, y + height*0.45, width*0.08, height*0.15);
-
-    // Tail
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.ellipse(x + width*0.85, y + height*0.65, width*0.2, height*0.12, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Eyes (menacing)
-    ctx.fillStyle = '#FF4444';
-    ctx.beginPath();
-    ctx.arc(x + width*0.15, y + height*0.2, width*0.03, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + width*0.25, y + height*0.2, width*0.03, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Teeth
-    ctx.fillStyle = '#FFFFFF';
-    for (let i = 0; i < 4; i++) {
-        const toothX = x + width*0.02 + i * width*0.03;
-        ctx.fillRect(toothX, y + height*0.3, width*0.015, height*0.04);
-    }
-}
-
-// Draw Ankylosaurus - more detailed and realistic
-function drawAnkylosaurus(ctx, x, y, width, height, color) {
-    // Add shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(x + 2, y + height + 2, width - 2, 3);
-
-    // Body with gradient (low and wide, armored look)
-    const bodyGradient = ctx.createLinearGradient(x, y, x + width, y + height);
-    bodyGradient.addColorStop(0, color);
-    bodyGradient.addColorStop(0.5, shadeColor(color, -15));
-    bodyGradient.addColorStop(1, shadeColor(color, -30));
-    ctx.fillStyle = bodyGradient;
-
-    // Main body (wide and low)
-    ctx.beginPath();
-    ctx.ellipse(x + width*0.5, y + height*0.6, width*0.4, height*0.2, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Head (small and low)
-    ctx.beginPath();
-    ctx.ellipse(x + width*0.15, y + height*0.55, width*0.15, height*0.12, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Four short, sturdy legs
-    ctx.fillStyle = shadeColor(color, -20);
-    // Front legs
-    ctx.fillRect(x + width*0.25, y + height*0.75, width*0.08, height*0.25);
-    ctx.fillRect(x + width*0.35, y + height*0.75, width*0.08, height*0.25);
-    // Back legs
-    ctx.fillRect(x + width*0.55, y + height*0.75, width*0.08, height*0.25);
-    ctx.fillRect(x + width*0.65, y + height*0.75, width*0.08, height*0.25);
-
-    // Armor plates on back
-    ctx.fillStyle = shadeColor(color, -40);
-    for (let i = 0; i < 5; i++) {
-        const plateX = x + width*0.25 + i * width*0.1;
-        ctx.beginPath();
-        ctx.ellipse(plateX, y + height*0.45, width*0.04, height*0.08, 0, 0, 2 * Math.PI);
-        ctx.fill();
-    }
-
-    // Armor spikes along sides
-    ctx.fillStyle = '#4A4A4A';
-    for (let i = 0; i < 6; i++) {
-        const spikeX = x + width*0.2 + i * width*0.12;
-        ctx.beginPath();
-        ctx.moveTo(spikeX, y + height*0.55);
-        ctx.lineTo(spikeX + width*0.02, y + height*0.45);
-        ctx.lineTo(spikeX + width*0.04, y + height*0.55);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    // Massive club tail
-    ctx.fillStyle = shadeColor(color, -25);
-    ctx.beginPath();
-    ctx.ellipse(x + width*0.9, y + height*0.6, width*0.12, height*0.15, 0, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Club spikes
-    ctx.fillStyle = '#3A3A3A';
-    for (let i = 0; i < 4; i++) {
-        const angle = (i * Math.PI) / 2;
-        const spikeX = x + width*0.9 + Math.cos(angle) * width*0.08;
-        const spikeY = y + height*0.6 + Math.sin(angle) * height*0.1;
-        ctx.fillRect(spikeX, spikeY, width*0.03, height*0.05);
-    }
-
-    // Eyes
-    ctx.fillStyle = '#8B4513';
-    ctx.beginPath();
-    ctx.arc(x + width*0.1, y + height*0.5, width*0.02, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + width*0.18, y + height*0.5, width*0.02, 0, 2 * Math.PI);
-    ctx.fill();
-}
-
-// Draw Stegosaurus
-function drawStegosaurus(ctx, x, y, width, height, color) {
-    // Add shadow for depth
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-    ctx.fillRect(x + 2, y + height - 2, width - 2, 3);
-
-    // Body with gradient
-    const bodyGradient = ctx.createLinearGradient(x, y + 20, x, y + height - 10);
-    bodyGradient.addColorStop(0, color);
-    bodyGradient.addColorStop(0.5, shadeColor(color, 20));
-    bodyGradient.addColorStop(1, shadeColor(color, -15));
-    ctx.fillStyle = bodyGradient;
-
-    // Main body (curved)
-    ctx.beginPath();
-    ctx.ellipse(x + width/2, y + height/2 + 5, width/2 - 15, height/3, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Body top line
-    ctx.beginPath();
-    ctx.ellipse(x + width/2, y + height/2 - 5, width/2 - 18, height/4, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Head with gradient (small and low)
-    const headGradient = ctx.createLinearGradient(x, y + 18, x + 20, y + 32);
-    headGradient.addColorStop(0, shadeColor(color, 10));
-    headGradient.addColorStop(1, shadeColor(color, -10));
-    ctx.fillStyle = headGradient;
-
-    ctx.beginPath();
-    ctx.ellipse(x + 10, y + 25, 10, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Eye
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.arc(x + 6, y + 23, 1.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Legs with gradient
-    const legGradient = ctx.createLinearGradient(x, y + height - 18, x, y + height);
-    legGradient.addColorStop(0, shadeColor(color, 5));
-    legGradient.addColorStop(1, shadeColor(color, -20));
-    ctx.fillStyle = legGradient;
-
-    // Four sturdy legs
-    const legPositions = [22, 32, width - 34, width - 24];
-    legPositions.forEach(legX => {
-        ctx.beginPath();
-        ctx.ellipse(x + legX + 3, y + height - 8, 4, 10, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Feet
-        ctx.fillStyle = shadeColor(color, -30);
-        ctx.fillRect(x + legX, y + height - 3, 8, 3);
-    });
-
-    // Iconic back plates with realistic coloring
-    const plateColors = ['#8FBC8F', '#7FBC7F', '#9FCC9F', '#8FAC8F'];
-    for (let i = 0; i < 5; i++) {
-        const plateX = x + 25 + i * 8;
-        const plateHeight = 18 + Math.sin(i * 0.6) * 6;
-        const plateColor = plateColors[i % plateColors.length];
-
-        // Plate gradient
-        const plateGradient = ctx.createLinearGradient(plateX, y, plateX + 8, y + 20);
-        plateGradient.addColorStop(0, plateColor);
-        plateGradient.addColorStop(0.7, shadeColor(plateColor, 15));
-        plateGradient.addColorStop(1, shadeColor(plateColor, -10));
-        ctx.fillStyle = plateGradient;
-
-        // Draw plate as triangle
-        ctx.beginPath();
-        ctx.moveTo(plateX + 1, y + 20 - plateHeight * 0.3);
-        ctx.lineTo(plateX + 4, y + 5);
-        ctx.lineTo(plateX + 7, y + 20 - plateHeight * 0.3);
-        ctx.closePath();
-        ctx.fill();
-
-        // Plate highlight
-        ctx.fillStyle = shadeColor(plateColor, 25);
-        ctx.beginPath();
-        ctx.moveTo(plateX + 2, y + 18 - plateHeight * 0.3);
-        ctx.lineTo(plateX + 4, y + 7);
-        ctx.lineTo(plateX + 4.5, y + 18 - plateHeight * 0.3);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    // Neck
-    ctx.fillStyle = bodyGradient;
-    ctx.beginPath();
-    ctx.ellipse(x + 18, y + 22, 6, 4, -0.3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Tail with spikes
-    const tailGradient = ctx.createLinearGradient(x + width - 20, y + 25, x + width + 5, y + 40);
-    tailGradient.addColorStop(0, color);
-    tailGradient.addColorStop(1, shadeColor(color, -15));
-    ctx.fillStyle = tailGradient;
-
-    // Tail body
-    ctx.beginPath();
-    ctx.ellipse(x + width - 10, y + 32, 12, 6, 0.2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Tail spikes (thagomizer)
-    const spikePositions = [
-        {x: x + width - 8, y: y + 26, size: 6},
-        {x: x + width - 3, y: y + 28, size: 8},
-        {x: x + width - 6, y: y + 34, size: 6},
-        {x: x + width - 1, y: y + 36, size: 7}
-    ];
-
-    ctx.fillStyle = '#A0522D'; // Sienna for spikes
-    spikePositions.forEach(spike => {
-        ctx.beginPath();
-        ctx.moveTo(spike.x, spike.y);
-        ctx.lineTo(spike.x + spike.size * 0.7, spike.y - spike.size);
-        ctx.lineTo(spike.x + spike.size, spike.y + 2);
-        ctx.closePath();
-        ctx.fill();
-
-        // Spike highlight
-        ctx.fillStyle = '#CD853F';
-        ctx.beginPath();
-        ctx.moveTo(spike.x + 1, spike.y);
-        ctx.lineTo(spike.x + spike.size * 0.7, spike.y - spike.size + 1);
-        ctx.lineTo(spike.x + 2, spike.y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = '#A0522D';
-    });
-}
 
 // Toggle game start/stop
 function toggleGame() {
@@ -811,9 +533,14 @@ let hasHighScoreBeenChecked = false; // Flag to prevent repeated DOM queries
 // Helper function to sanitize user input to prevent XSS
 function sanitizeInput(input) {
     if (!input) return 'Anonymous';
-    // Remove HTML/script tags and dangerous characters
+    // Comprehensive XSS protection - escape all HTML entities
     return input
-        .replace(/[<>"'&]/g, '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;')
         .trim()
         .substring(0, MAX_NAME_LENGTH);
 }
@@ -955,5 +682,27 @@ if (document.readyState === 'loading') {
     loadLeaderboard();
 }
 
+// Cleanup function to prevent memory leaks
+function cleanup() {
+    // Clear game loop interval
+    if (gameLoopInterval) {
+        clearInterval(gameLoopInterval);
+        gameLoopInterval = null;
+    }
+
+    // Clean up MediaPipe resources
+    if (faceDetection) {
+        faceDetection.close();
+    }
+
+    if (camera) {
+        camera.stop();
+    }
+}
+
 // Initialize when page loads
 window.addEventListener('load', setup);
+
+// Cleanup when page unloads
+window.addEventListener('beforeunload', cleanup);
+window.addEventListener('unload', cleanup);
