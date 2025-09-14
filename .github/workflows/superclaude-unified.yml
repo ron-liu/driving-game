@@ -1,0 +1,75 @@
+name: SuperClaude Unified Handler
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  superclaude-handler:
+    # Clear conditions to avoid conflicts
+    if: |
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'claude-fix')) ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run SuperClaude Framework
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            **SuperClaude Framework Active** - Unified Handler Mode
+
+            /sc:load → Initialize project context
+
+            **Task Management Workflow**:
+            1. Use --task-manage to break issue into structured tasks
+            2. Apply TodoWrite for progress tracking
+            3. Use appropriate analysis modes:
+               - --think for code analysis
+               - --think-hard for complex architecture
+               - --orchestrate for multi-tool coordination
+
+            **Implementation Strategy**:
+            1. Understand requirements (use --brainstorm if unclear)
+            2. Analyze codebase with semantic tools
+            3. Create feature branch: `git checkout -b issue-${{ github.event.issue.number || 'pr-comment' }}`
+            4. Implement solution following SOLID principles
+            5. Write/update tests (never skip validation)
+            6. Create PR with structured description
+            7. Link PR to original issue if applicable
+
+            **SuperClaude Tools Available**:
+            - --serena: Semantic code operations and project memory
+            - --context7: Framework documentation lookup
+            - --sequential: Complex reasoning and analysis
+            - --magic: UI component generation if needed
+            - --morphllm: Bulk code transformations
+
+            **Quality Gates**:
+            - Run lint/typecheck before committing
+            - Ensure tests pass
+            - Follow project conventions from CLAUDE.md
+
+            /sc:save → Preserve session context
+
+          claude_args: '--allowed-tools "*"'
