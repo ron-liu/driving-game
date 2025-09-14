@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archie's Hand-Controlled Driving Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            text-align: center;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin: 5px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .instructions {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex: 1;
+            align-items: flex-start;
+            max-height: 70vh;
+        }
+
+        .video-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        video {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 280px;
+            height: 210px;
+        }
+
+        canvas {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .status {
+            margin-top: 8px;
+            padding: 6px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚙 Archie's Cybertruck vs Dinosaurs! 🦕</h1>
+
+    <div class="instructions">
+        <p><strong>How to Play:</strong></p>
+        <p>🎛️ <strong>Choose Difficulty</strong> - Select difficulty level below to adjust dinosaur frequency</p>
+        <p>🎮 <strong>Start Game</strong> - Click "Start Game" button or press SPACE key</p>
+        <p>👤 <strong>Head Movement Control</strong> - Move your head left/right to steer</p>
+        <p>↔️ <strong>Steering Control</strong> - Head left = truck left, head right = truck right</p>
+        <p>🚫 <strong>Game Goal</strong> - Avoid crashing into the dinosaurs in your Cybertruck!</p>
+    </div>
+
+    <div class="game-container">
+        <div class="video-container">
+            <video id="video" width="320" height="240" autoplay muted></video>
+            <div class="status" id="handStatus">Camera starting...</div>
+        </div>
+
+        <div>
+            <canvas id="gameCanvas" width="480" height="600"></canvas>
+            <div class="status" id="gameStatus">Score: 0 | Speed: 1</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div style="margin-bottom: 15px;">
+            <label for="difficulty" style="color: white; font-size: 1.1em; margin-right: 10px;">Difficulty:</label>
+            <select id="difficulty" style="padding: 8px 15px; font-size: 1em; border-radius: 5px; border: none; background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; cursor: pointer;">
+                <option value="easy">Easy (Few Dinosaurs)</option>
+                <option value="medium">Medium (Normal Dinosaurs)</option>
+                <option value="hard">Hard (Many Dinosaurs)</option>
+            </select>
+        </div>
+        <button id="startBtn">Start Game</button>
+        <button id="resetBtn">Reset Score</button>
+    </div>
+
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
+
+    <!-- p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+
+    <!-- Game Script -->
+    <script src="game.js"></script>
+</body>
+</html>
