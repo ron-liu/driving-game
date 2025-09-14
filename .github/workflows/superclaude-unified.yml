@@ -1,8 +1,8 @@
 name: SuperClaude Unified Handler
 
-# Prevent duplicate workflow runs with strict concurrency
+# Ultra-strict concurrency control to prevent duplicates
 concurrency:
-  group: superclaude-${{ github.event.issue.number || github.event.comment.id || github.event.number }}
+  group: superclaude-unified-${{ github.event.issue.number || github.event.comment.id }}-${{ github.event_name }}-${{ github.event.action }}
   cancel-in-progress: true
 
 on:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   superclaude-handler:
-    # Strict conditions to prevent duplicates - only one trigger path
+    # Ultra-strict conditions with runtime duplicate check
     if: |
       (github.event_name == 'issues' &&
        github.event.action == 'labeled' &&
@@ -33,12 +33,43 @@ jobs:
       id-token: write
 
     steps:
+      - name: Runtime Duplicate Check
+        id: duplicate-check
+        run: |
+          echo "Checking for duplicate runs..."
+          
+          # Get current workflow runs for this issue
+          CURRENT_RUNS=$(gh run list \
+            --workflow="superclaude-unified.yml" \
+            --json status,conclusion,createdAt,id \
+            --jq '[.[] | select(.status == "in_progress" or .status == "queued")] | length')
+          
+          echo "Active runs for this workflow: $CURRENT_RUNS"
+          
+          if [ "$CURRENT_RUNS" -gt 1 ]; then
+            echo "Multiple runs detected. This run will exit to prevent duplicates."
+            echo "duplicate=true" >> $GITHUB_OUTPUT
+          else
+            echo "No duplicates detected. Proceeding with execution."
+            echo "duplicate=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Exit if Duplicate
+        if: steps.duplicate-check.outputs.duplicate == 'true'
+        run: |
+          echo "🚫 Exiting due to duplicate run detection"
+          exit 0
+
       - name: Checkout repository
+        if: steps.duplicate-check.outputs.duplicate == 'false'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Run SuperClaude Framework
+        if: steps.duplicate-check.outputs.duplicate == 'false'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
